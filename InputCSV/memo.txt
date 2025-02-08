@@ -1,0 +1,8 @@
+Please add the following input CSV files:
+
+school_student_list.csv		The list of students for this school year, provided by the school.
+
+spro_current_users.csv		The existing user list, exported from School Pro.
+
+
+
