@@ -335,14 +335,7 @@ def adjust_ename(s):
 	return s
 
 
-#=============================================================================
-# 英性別(F,M)を日本語性別(女,男)に変換
 
-sx_etoj = {'F' : '女', 'M' : '男'}
-def conv_sx(s):
-	if not s in sx_etoj:
-		print_stderr_exit('不明な性別(F,M以外)が入力されました:', s)
-	return sx_etoj[s]
 
 #*****************************************************************************
 # SchoolListFormat() クラス
@@ -355,22 +348,18 @@ SchoolListKeys = {
 	# 2019年版 csv の書式
 	'W':                   ('csid',   ''),
 	'生徒名':              ('ename',  ''),
-	'SEX':                 ('sx',     ''),
 	'JNAME':               ('jname',  ''),
 	'JPNAME':              ('pname',  ''),
 	'GRD':                 ('grade',  ''),
 	'CLS':                 ('class',  ''),
-	'EMAIL':               ('email',  ''),
 	# 2021年版 csv 対応
 	'生徒番号':            ('csid',   ''),
 	'生徒名(英語)':        ('ename',  ''),
-	'性別':                ('sx',     'JP'), # 性別が日本語表記
 	'生徒名(日本語)':      ('jname',  ''),
 	'保護者名(日本語)':    ('pname',  ''),
 	'保護者名(英語)':      ('pname',  ''),   # とりあえずは日本語と同様に処理
 	'学年':                ('grade',  ''),
-	'クラス':              ('class',  ''),
-	'緊急連絡先1(Email)':  ('email',  '')
+	'クラス':              ('class',  '')
 }
 
 class SchoolListFormat:
@@ -464,7 +453,7 @@ class ToshoUser:
 		ogname = sf.getField('pname')
 		gname = re.sub('[\,，]', ' ', ogname)
 		self.gname = normalize_name(gname) # 保護者名
-		self.email = rmsp(sf.getField('email'))
+		self.email = '' # 2025年度よりE-mailは登録しない
 		self.graduated = '' #転退をキャンセル
 		self.graddate = ''
 		self.isActive = 1
@@ -473,16 +462,7 @@ class ToshoUser:
 	#-----------------------------------------------------------------------
 
 	def updateForNewYear(self, sf, uid, cat, sect, grade, jname, year):
-		sx = sf.getField('sx')
-		if (self.sx != sx):
-			if self.sx == '':
-				print_stderr('警告: 既登録利用者 %u の性別が空白です。学校提供CSVの性別 %s を登録します'
-							 % (uid, sx))
-				self.sx = sx
-			else:
-				print_stderr('重大な警告: 利用者番号', uid, \
-						'利用者性別が一致しません。School Pro:', self.sx,
-						'学校提供CSV:', sx)
+		self.sx = '' # 2025年度より性別は記録しない
 
 		if (self.cat == '卒業生・退学者'):
 			print_stderr('警告: 利用者番号', uid, \
@@ -497,7 +477,7 @@ class ToshoUser:
 	def fillNewUser(self, sf, uid, cat, sect, grade, jname, year, arbit):
 		self.uid = uid
 		self.cno   = 0  # 後で割り当て
-		self.sx   = sf.getField('sx')
+		self.sx   = '' # 2025年度より性別は記録しない
 		self.year = year
 		self.arbit = arbit
 		self.parseSchoolCsvCommon(sf, cat, sect, grade, jname)
